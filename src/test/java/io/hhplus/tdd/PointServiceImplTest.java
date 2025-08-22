@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import io.displayName;
 import io.hhplus.tdd.point.database.PointHistoryTable;
 import io.hhplus.tdd.point.database.UserPointTable;
+import io.hhplus.tdd.point.model.PointHistory;
 import io.hhplus.tdd.point.model.TransactionType;
 import io.hhplus.tdd.point.model.UserPoint;
 import io.hhplus.tdd.point.service.PointServiceImpl;
@@ -391,6 +394,61 @@ class PointServiceImplTest {
 
             //then
             assertThat(result).isEqualTo(preSetInfo);
+        }
+    }
+
+    @Nested
+    @displayName("포인트 내역 조회 테스트")
+    class findPointHistoryTest{
+
+        @Test
+        @DisplayName("포인트 내역 조회 테스트 - 실패 : 사용자 아이디 검증 실패")
+        void findPointHistoryTest_validation_fail_ByUserId() {
+            // given
+            long userId = 0; // 잘못된 사용자 아이디
+
+            // when
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                pointService.selectHistoriesById(userId);
+            });
+
+            // then
+            assertThat(exception.getMessage()).isEqualTo("잘못된 사용자 아이디 입니다.");
+        }
+
+        @Test
+        @displayName("포인트 내역 조회 테스트 - 실패 : 사용자 아이디에 해당하는 포인트 내역이 없으면 빈값을 반환")
+        void findPointHistoryTest_fail_noData(){
+            //given
+            long userId = 1L;
+
+            //when
+             List<PointHistory> result = pointService.selectHistoriesById(userId);
+
+            //then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @displayName("포인트 내역 조회 테스트 - 성공 : 사용자 아이디에 해당하는 포인트 정보를 옳바르게 조회해서 반환하는지 확인")
+        void findPointHistoryTest_Ok(){
+            //given
+            long userId = 1L; 
+            long updateMillis = 1213L;
+
+            List<PointHistory> list = new ArrayList<>();
+            list.add(new PointHistory(1L, userId, 5000L, TransactionType.CHARGE, updateMillis));
+            list.add(new PointHistory(2L, userId, 1000L, TransactionType.USE, updateMillis));
+            list.add(new PointHistory(3L, userId, 3000L, TransactionType.CHARGE, updateMillis));
+
+            when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(list);
+
+            //when
+            List<PointHistory> result = pointService.selectHistoriesById(userId);
+
+            //then
+            assertThat(result).isNotEmpty();
+            assertThat(result.size()).isEqualTo(3);
         }
     }
 

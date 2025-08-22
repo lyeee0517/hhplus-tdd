@@ -1,5 +1,8 @@
 package io.hhplus.tdd.point.service;
 
+import java.util.List;
+
+import io.hhplus.tdd.point.model.PointHistory;
 import io.hhplus.tdd.point.model.UserPoint;
 
 public interface PointService {
@@ -10,4 +13,6 @@ public interface PointService {
 
     UserPoint selectPointById(long userId);
     
+    List<PointHistory> selectHistoriesById(long userId);
+
 }

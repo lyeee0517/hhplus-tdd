@@ -1,9 +1,12 @@
 package io.hhplus.tdd.point.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import io.hhplus.tdd.point.database.PointHistoryTable;
 import io.hhplus.tdd.point.database.UserPointTable;
+import io.hhplus.tdd.point.model.PointHistory;
 import io.hhplus.tdd.point.model.TransactionType;
 import io.hhplus.tdd.point.model.UserPoint;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +59,13 @@ public class PointServiceImpl implements PointService {
         checkValidation_userId(userId);
 
         return userPointTable.selectById(userId);
+    }
+
+    @Override
+    public List<PointHistory> selectHistoriesById(long userId) {
+        checkValidation_userId(userId);
+
+        return PointHistoryTable.selectAllByUserId(userId);
     }
 
     // upset 시 유효성 체크
