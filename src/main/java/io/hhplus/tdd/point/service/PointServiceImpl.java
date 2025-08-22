@@ -51,6 +51,13 @@ public class PointServiceImpl implements PointService {
         return result;
     }
 
+    @Override
+    public UserPoint selectPointById(long userId) {
+        checkValidation_userId(userId);
+
+        return userPointTable.selectById(userId);
+    }
+
     // upset 시 유효성 체크
     private void checkValidation(long userId, long amount) {
         if (userId < 1) {
@@ -58,6 +65,12 @@ public class PointServiceImpl implements PointService {
         }
         if (amount < 0 || amount < MINIMUM_CHARGE_AMOUNT) {
             throw new IllegalArgumentException("충전/사용 금액은 " + MINIMUM_CHARGE_AMOUNT + "원부터 가능합니다.");
+        }
+    }
+
+    private void checkValidation_userId(long userId) {
+        if (userId < 1) {
+            throw new IllegalArgumentException("잘못된 사용자 아이디 입니다.");
         }
     }
 

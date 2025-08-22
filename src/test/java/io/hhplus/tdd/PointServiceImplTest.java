@@ -355,7 +355,43 @@ class PointServiceImplTest {
             assertThat(amountCaptor.getValue()).isEqualTo(amount);
             assertThat(typeCaptor.getValue()).isEqualTo(TransactionType.USE);
         }
+    }
 
+    @Nested
+    @displayName("포인트 조회 테스트")
+    class findPointTest{
+
+        @Test
+        @DisplayName("포인트 조회 테스트 - 실패 : 사용자 아이디 검증 실패")
+        void findPointTest_validation_fail_ByUserId() {
+            // given
+            long userId = 0; // 잘못된 사용자 아이디
+
+            // when
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                pointService.selectPointById(userId);
+            });
+
+            // then
+            assertThat(exception.getMessage()).isEqualTo("잘못된 사용자 아이디 입니다.");
+        }
+
+        @Test
+        @displayName("포인트 조회 테스트 - 성공 : 사용자 아이디에 해당하는 포인트 정보를 옳바르게 조회해서 반환하는지 확인")
+        void findPointTest_Ok(){
+            //given
+            long userId = 1L; 
+            long amount = 3000L;
+
+            UserPoint preSetInfo = new UserPoint(userId, amount, System.currentTimeMillis());
+            when(userPointTable.selectById(userId)).thenReturn(preSetInfo);
+
+            //when
+            UserPoint result = pointService.selectPointById(userId);
+
+            //then
+            assertThat(result).isEqualTo(preSetInfo);
+        }
     }
 
 }

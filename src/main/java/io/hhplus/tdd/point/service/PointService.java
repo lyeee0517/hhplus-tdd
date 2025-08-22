@@ -7,5 +7,7 @@ public interface PointService {
     UserPoint chargePoint(long userId, long amount);
 
     UserPoint usePoint(long userId, long amount);
+
+    UserPoint selectPointById(long userId);
     
 }
